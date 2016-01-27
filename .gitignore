@@ -6,6 +6,9 @@ Makefile
 cmake_install.cmake
 install_manifest.txt
 
+# LIN generated files
+gen/
+
 # Compiled Object files
 *.slo
 *.lo
