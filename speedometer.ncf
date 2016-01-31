@@ -1,0 +1,42 @@
+node_capability_file;
+LIN_language_version = "2.2";
+node speedometer {
+	general {
+		LIN_protocol_version = "2.2";
+		supplier = 0x4854;
+		function = 0x7654;
+		variant  = 0;
+		bitrate = automatic min 10 kbps max 20 kbps;
+		sends_wake_up_signal = "no";
+	}
+	diagnostic {
+		NAD = 0x01 to 0x7D;
+		diagnostic_class = 1;
+	}
+	frames {
+		publish speedometer_frame {
+			length = 3;
+			signals {
+				axle_rpm {
+					size       = 10;
+					init_value = 0;
+					offset 	   = 0;
+					speed_encoding;
+				}
+				error_bit {
+					size = 1; 
+					init_value = 0; 
+					offset = 30;
+				}
+			}
+		}
+	}
+	encoding {
+		// TODO the numbers that I plugged in here I just made up because I do not know what the
+		// actual size of the tires will be.
+		speed_encoding { physical_value, 0, 1023,0.05865,0,"The speed of the vehicle [0,60]MPH; if the vehicle has 20 inch diameter tires."; }
+	}
+	status_management {
+		response_error = error_bit;
+	}
+}
