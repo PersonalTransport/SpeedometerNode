@@ -10,7 +10,7 @@ node speedometer {
 		sends_wake_up_signal = "no";
 	}
 	diagnostic {
-		NAD = 0x01 to 0x7D;
+		NAD = 0x01;
 		diagnostic_class = 1;
 	}
 	frames {
@@ -23,10 +23,10 @@ node speedometer {
 					offset 	   = 0;
 					speed_encoding;
 				}
-				error_bit {
-					size = 1; 
-					init_value = 0; 
-					offset = 30;
+				speedometer_error_bit {
+					size = 1;
+					init_value = 0;
+					offset = 10;
 				}
 			}
 		}
@@ -37,6 +37,6 @@ node speedometer {
 		speed_encoding { physical_value, 0, 1023,0.05865,0,"The speed of the vehicle [0,60]MPH; if the vehicle has 20 inch diameter tires."; }
 	}
 	status_management {
-		response_error = error_bit;
+		response_error = speedometer_error_bit;
 	}
 }
