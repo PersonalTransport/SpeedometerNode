@@ -41,6 +41,8 @@ struct l_irqmask l_sys_irq_disable() {
     IEC0bits.U1RXIE = 0;
     IEC0bits.U1TXIE = 0;
     IEC0bits.IC1IE  = 0;
+    IFS0bits.U1TXIF = 0;
+    IFS0bits.U1RXIF = 0;
     struct l_irqmask mask = {IPC2bits.U1RXIP,IPC3bits.U1TXIP,IPC0bits.IC1IP};
     return mask;
 }
