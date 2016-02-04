@@ -60,3 +60,5 @@ install_manifest.txt
 *.iml
 /EvMaster.X/build/default/
 /EvMaster.X/dist/default/
+/SpeedometerNode.X/build/default/
+/SpeedometerNode.X/dist/default/

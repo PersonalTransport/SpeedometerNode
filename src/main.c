@@ -37,6 +37,28 @@
 #include <xc.h>
 #include <speedometer.h>
 
+struct l_irqmask l_sys_irq_disable() {
+    IEC0bits.U1RXIE = 0;
+    IEC0bits.U1TXIE = 0;
+    IEC0bits.IC1IE  = 0;
+    struct l_irqmask mask = {IPC2bits.U1RXIP,IPC3bits.U1TXIP,IPC0bits.IC1IP};
+    return mask;
+}
+
+void l_sys_irq_restore(struct l_irqmask previous) {
+    IPC2bits.U1RXIP = previous.rx_level;
+    IFS0bits.U1TXIF = 0;
+    IEC0bits.U1RXIE = 1;
+
+    IPC3bits.U1TXIP = previous.tx_level;
+    IFS0bits.U1RXIF = 0;
+    IEC0bits.U1TXIE = 1;
+
+    IPC0bits.IC1IP = previous.t1_level;
+    IFS0bits.IC1IF = 0;
+    IEC0bits.IC1IE = 1;
+}
+
 void main_task() {
     // Put the node specific function here!
 }
@@ -49,6 +71,9 @@ int main() {
     // Initialize the interface
     if(l_ifc_init_UART1())
         return -1;
+
+    struct l_irqmask irqmask = {4,4,7};
+    l_sys_irq_restore(irqmask);
 
     while(1) {
         main_task();
@@ -75,7 +100,7 @@ void __attribute__((interrupt,no_auto_psv)) _U1RXInterrupt() {
         IFS0bits.U1RXIF = 0;
 
         l_ifc_rx_UART1();
-        
+
         if(U1STAbits.FERR)
             U1STAbits.FERR = 0;
     }

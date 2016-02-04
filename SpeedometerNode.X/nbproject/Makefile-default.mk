@@ -45,17 +45,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=../src/main.c
+SOURCEFILES_QUOTED_IF_SPACED=../src/main.c ../gen/speedometer.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1360937237/main.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1360937237/main.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1360937237/main.o ${OBJECTDIR}/_ext/1360925313/speedometer.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1360937237/main.o.d ${OBJECTDIR}/_ext/1360925313/speedometer.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/_ext/1360937237/main.o
+OBJECTFILES=${OBJECTDIR}/_ext/1360937237/main.o ${OBJECTDIR}/_ext/1360925313/speedometer.o
 
 # Source Files
-SOURCEFILES=../src/main.c
+SOURCEFILES=../src/main.c ../gen/speedometer.c
 
 
 CFLAGS=
@@ -89,6 +89,13 @@ ${OBJECTDIR}/_ext/1360937237/main.o: ../src/main.c  nbproject/Makefile-${CND_CON
 	${MP_CC} $(MP_EXTRA_CC_PRE)  ../src/main.c  -o ${OBJECTDIR}/_ext/1360937237/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1360937237/main.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1    -omf=elf -legacy-libc  -I"../gen" -I"../include" -O0 -msmart-io=1 -Wall -msfr-warn=off   -std=c99
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1360937237/main.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
+${OBJECTDIR}/_ext/1360925313/speedometer.o: ../gen/speedometer.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/_ext/1360925313" 
+	@${RM} ${OBJECTDIR}/_ext/1360925313/speedometer.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1360925313/speedometer.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../gen/speedometer.c  -o ${OBJECTDIR}/_ext/1360925313/speedometer.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1360925313/speedometer.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1    -omf=elf -legacy-libc  -I"../gen" -I"../include" -O0 -msmart-io=1 -Wall -msfr-warn=off   -std=c99
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1360925313/speedometer.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
 else
 ${OBJECTDIR}/_ext/1360937237/main.o: ../src/main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/_ext/1360937237" 
@@ -96,6 +103,13 @@ ${OBJECTDIR}/_ext/1360937237/main.o: ../src/main.c  nbproject/Makefile-${CND_CON
 	@${RM} ${OBJECTDIR}/_ext/1360937237/main.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  ../src/main.c  -o ${OBJECTDIR}/_ext/1360937237/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1360937237/main.o.d"        -g -omf=elf -legacy-libc  -I"../gen" -I"../include" -O0 -msmart-io=1 -Wall -msfr-warn=off   -std=c99
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1360937237/main.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/_ext/1360925313/speedometer.o: ../gen/speedometer.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/_ext/1360925313" 
+	@${RM} ${OBJECTDIR}/_ext/1360925313/speedometer.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1360925313/speedometer.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../gen/speedometer.c  -o ${OBJECTDIR}/_ext/1360925313/speedometer.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1360925313/speedometer.o.d"        -g -omf=elf -legacy-libc  -I"../gen" -I"../include" -O0 -msmart-io=1 -Wall -msfr-warn=off   -std=c99
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1360925313/speedometer.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 endif
 
