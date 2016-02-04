@@ -15,7 +15,7 @@ node speedometer {
 	}
 	frames {
 		publish speedometer_frame {
-			length = 3;
+			length = 2;
 			signals {
 				axle_rpm {
 					size       = 10;
