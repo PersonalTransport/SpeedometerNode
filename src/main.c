@@ -35,6 +35,7 @@
 #pragma config JTAGEN = OFF // JTAG Port Enable (JTAG port is disabled)
 
 #include <xc.h>
+#include <libpic30.h>
 #include <speedometer.h>
 
 void main_task()
@@ -57,6 +58,22 @@ int main()
     // Set the timer used for break detection to interrupt level 7
     struct l_irqmask irqmask = { 6, 6, 7 };
     l_sys_irq_restore(irqmask);
+    
+    l_bool configuration_ok = false;
+    l_u16 configuration_timeout = 1000;
+    do {
+        if (l_ifc_read_status_UART1() & (1 << 6)) {
+            configuration_ok = true;
+            break;
+        }
+        __delay_ms(5);
+        configuration_timeout--;
+    } while (configuration_timeout || !configuration_ok);
+    
+    if (!configuration_ok) {
+        // Master did not configure this node.
+        return -1;
+    }
 
     while (1) {
         main_task();
