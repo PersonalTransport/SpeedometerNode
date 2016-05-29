@@ -4,13 +4,13 @@ node speedometer {
 	general {
 		LIN_protocol_version = "2.2";
 		supplier = 0x4854;
-		function = 0x7654;
+		function = 0x0022;
 		variant  = 0;
 		bitrate = automatic min 10 kbps max 20 kbps;
 		sends_wake_up_signal = "no";
 	}
 	diagnostic {
-		NAD = 0x01;
+		NAD = 0x43;
 		diagnostic_class = 1;
 	}
 	frames {
@@ -34,7 +34,7 @@ node speedometer {
 	encoding {
 		// TODO the numbers that I plugged in here I just made up because I do not know what the
 		// actual size of the tires will be.
-		speed_encoding { physical_value, 0, 1023,0.05865,0,"The speed of the vehicle [0,60]MPH; if the vehicle has 20 inch diameter tires."; }
+		speed_encoding { physical_value, 0, 1023,0.059499,0,"The speed of the vehicle [0,60]MPH; if the vehicle has 20 inch diameter tires."; }
 	}
 	status_management {
 		response_error = speedometer_error_bit;

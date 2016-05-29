@@ -34,9 +34,9 @@
 #pragma config GCP = OFF // General Segment Code Protect (Code protection is disabled)
 #pragma config JTAGEN = OFF // JTAG Port Enable (JTAG port is disabled)
 
-#include <xc.h>
 #include <libpic30.h>
 #include <speedometer.h>
+#include <xc.h>
 
 void main_task()
 {
@@ -45,7 +45,7 @@ void main_task()
 
 int main()
 {
-    // Initialize the LIN interface
+   // Initialize the LIN interface
     if (l_sys_init())
         return -1;
 
@@ -53,8 +53,8 @@ int main()
     if (l_ifc_init_UART1())
         return -1;
 
-    // Set UART TX to interrupt level 6
-    // Set UART RX to interrupt level 6
+    // Set UART TX to interrupt level 5
+    // Set UART RX to interrupt level 5
     struct l_irqmask irqmask = { 6, 6 };
     l_sys_irq_restore(irqmask);
     
@@ -73,7 +73,32 @@ int main()
         // Master did not configure this node.
         return -1;
     }
-
+    
+    TRISBbits.TRISB8 = 1;
+    __builtin_write_OSCCONL(OSCCON & ~(1<<6));
+    RPINR7bits.IC1R = 8;
+    __builtin_write_OSCCONL(OSCCON | (1<<6));
+    
+     // Setup a 125ms timer
+    T1CONbits.TON = 1;
+    T1CONbits.TSIDL = 0;
+    T1CONbits.TGATE = 0;
+    T1CONbits.TCKPS = 2;
+    T1CONbits.TSYNC = 0;
+    T1CONbits.TCS = 0;
+    PR1 = FCY / 64ul / 8ul;
+    
+    IEC0bits.T1IE = 1;
+    IPC0bits.T1IP = 4;
+    
+    IC1CON2bits.SYNCSEL = 0b10100;
+    IC1CON1bits.ICTSEL  = 0b111;
+    IC1CON1bits.ICI     = 0x00;
+    IC1CON2bits.ICTRIG  = 0x00;
+    IC1CON1bits.ICM     = 0x03;
+    IEC0bits.IC1IE = 1;
+    IPC0bits.IC1IP = 3;
+    
     while (1) {
         main_task();
     }
@@ -81,7 +106,33 @@ int main()
     return -1;
 }
 
-void __attribute__((interrupt, no_auto_psv)) _U1TXInterrupt()
+unsigned int count = 0;
+void __attribute__((interrupt,no_auto_psv)) _IC1Interrupt() {
+    if(IFS0bits.IC1IF) {
+        IFS0bits.IC1IF = 0;
+        count++;
+    }
+}
+
+void __attribute__((interrupt, no_auto_psv)) _T1Interrupt()
+{
+    if (IFS0bits.T1IF) {
+        IFS0bits.T1IF = 0;
+        //(count/t)/8 => rev/s
+        //60*(count/t)/8 => rev/m
+        //(60/(8*t))*count => rev/m
+        //t = .125s 
+        //(60/(8*.125))*count => rev/m
+        //60*count => rev/m
+        if(l_flg_tst_axle_rpm()) {
+            l_flg_clr_axle_rpm();
+            l_u16_wr_axle_rpm(count * 60);
+        }
+        count = 0;
+    }
+}
+
+void __attribute__((interrupt, auto_psv)) _U1TXInterrupt()
 {
     if (IFS0bits.U1TXIF) {
         IFS0bits.U1TXIF = 0;
@@ -89,7 +140,7 @@ void __attribute__((interrupt, no_auto_psv)) _U1TXInterrupt()
     }
 }
 
-void __attribute__((interrupt, no_auto_psv)) _U1RXInterrupt()
+void __attribute__((interrupt, auto_psv)) _U1RXInterrupt()
 {
     if (IFS0bits.U1RXIF) {
         IFS0bits.U1RXIF = 0;
@@ -99,11 +150,11 @@ void __attribute__((interrupt, no_auto_psv)) _U1RXInterrupt()
 
 struct l_irqmask l_sys_irq_disable()
 {
+    struct l_irqmask mask = { IPC2bits.U1RXIP, IPC3bits.U1TXIP };
     IEC0bits.U1RXIE = 0;
     IEC0bits.U1TXIE = 0;
     IFS0bits.U1TXIF = 0;
     IFS0bits.U1RXIF = 0;
-    struct l_irqmask mask = { IPC2bits.U1RXIP, IPC3bits.U1TXIP };
     return mask;
 }
 
