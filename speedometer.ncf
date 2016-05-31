@@ -15,7 +15,7 @@ node speedometer {
 	}
 	frames {
 		publish speedometer_frame {
-			length = 3;
+			length = 5;
 			signals {
 				axle_rpm {
 					size       = 16;
@@ -23,18 +23,23 @@ node speedometer {
 					offset 	   = 0;
 					speed_encoding;
 				}
+				axle_rotations {
+					size = 16;
+					init_value = 0;
+					offset = 16;
+					distance_encoding;
+				}
 				speedometer_error_bit {
 					size = 1;
 					init_value = 0;
-					offset = 16;
+					offset = 32;
 				}
 			}
 		}
 	}
 	encoding {
-		// TODO the numbers that I plugged in here I just made up because I do not know what the
-		// actual size of the tires will be.
 		speed_encoding { physical_value, 0, 0xFFFF,0.059499,0,"The speed of the vehicle [0,60]MPH; if the vehicle has 20 inch diameter tires."; }
+		distance_encoding { physical_value, 0, 0xFFFF,0.253866,0,"The distance the vehicle has traveled in miles since reset."; }
 	}
 	status_management {
 		response_error = speedometer_error_bit;

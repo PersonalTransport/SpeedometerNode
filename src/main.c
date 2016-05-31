@@ -38,14 +38,9 @@
 #include <speedometer.h>
 #include <xc.h>
 
-void main_task()
-{
-    // Put the node specific function here!
-}
-
 int main()
 {
-   // Initialize the LIN interface
+    // Initialize the LIN interface
     if (l_sys_init())
         return -1;
 
@@ -57,7 +52,7 @@ int main()
     // Set UART RX to interrupt level 5
     struct l_irqmask irqmask = { 6, 6 };
     l_sys_irq_restore(irqmask);
-    
+
     l_bool configuration_ok = false;
     l_u16 configuration_timeout = 1000;
     do {
@@ -68,18 +63,18 @@ int main()
         __delay_ms(5);
         configuration_timeout--;
     } while (configuration_timeout || !configuration_ok);
-    
+
     if (!configuration_ok) {
         // Master did not configure this node.
         return -1;
     }
-    
+
     TRISBbits.TRISB8 = 1;
-    __builtin_write_OSCCONL(OSCCON & ~(1<<6));
+    __builtin_write_OSCCONL(OSCCON & ~(1 << 6));
     RPINR7bits.IC1R = 8;
-    __builtin_write_OSCCONL(OSCCON | (1<<6));
-    
-     // Setup a 125ms timer
+    __builtin_write_OSCCONL(OSCCON | (1 << 6));
+
+    // Setup a 125ms timer
     T1CONbits.TON = 1;
     T1CONbits.TSIDL = 0;
     T1CONbits.TGATE = 0;
@@ -87,30 +82,32 @@ int main()
     T1CONbits.TSYNC = 0;
     T1CONbits.TCS = 0;
     PR1 = FCY / 64ul / 8ul;
-    
+
     IEC0bits.T1IE = 1;
     IPC0bits.T1IP = 4;
-    
+
     IC1CON2bits.SYNCSEL = 0b10100;
-    IC1CON1bits.ICTSEL  = 0b111;
-    IC1CON1bits.ICI     = 0x00;
-    IC1CON2bits.ICTRIG  = 0x00;
-    IC1CON1bits.ICM     = 0x03;
+    IC1CON1bits.ICTSEL = 0b111;
+    IC1CON1bits.ICI = 0x00;
+    IC1CON2bits.ICTRIG = 0x00;
+    IC1CON1bits.ICM = 0x03;
     IEC0bits.IC1IE = 1;
     IPC0bits.IC1IP = 3;
-    
+
     while (1) {
-        main_task();
     }
 
     return -1;
 }
 
-unsigned int count = 0;
-void __attribute__((interrupt,no_auto_psv)) _IC1Interrupt() {
-    if(IFS0bits.IC1IF) {
+l_u16 ticks = 0;
+uint32_t total_ticks = 0;
+void __attribute__((interrupt, no_auto_psv)) _IC1Interrupt()
+{
+    if (IFS0bits.IC1IF) {
         IFS0bits.IC1IF = 0;
-        count++;
+        ticks++;
+        total_ticks++;
     }
 }
 
@@ -118,17 +115,21 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt()
 {
     if (IFS0bits.T1IF) {
         IFS0bits.T1IF = 0;
-        //(count/t)/8 => rev/s
-        //60*(count/t)/8 => rev/m
-        //(60/(8*t))*count => rev/m
-        //t = .125s 
-        //(60/(8*.125))*count => rev/m
-        //60*count => rev/m
-        if(l_flg_tst_axle_rpm()) {
+        //(ticks/t)/8 => rev/s
+        //60*(ticks/t)/8 => rev/m
+        //(60/(8*t))*ticks => rev/m
+        //t = .125s
+        //(60/(8*.125))*ticks => rev/m
+        //60*ticks => rev/m
+        if (l_flg_tst_axle_rpm()) {
             l_flg_clr_axle_rpm();
-            l_u16_wr_axle_rpm(count * 60);
+            l_u16_wr_axle_rpm(ticks * 60);
         }
-        count = 0;
+        if (l_flg_tst_axle_rotations()) {
+            l_flg_clr_axle_rotations();
+            l_u16_wr_axle_rotations(total_ticks >> 11);
+        }
+        ticks = 0;
     }
 }
 
